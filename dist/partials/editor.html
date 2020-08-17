@@ -58,5 +58,17 @@
                 <select class="gf-form-input" ng-model="ctrl.panel.orientation" ng-options="t for t in ['horizontal', 'vertical']" ng-change="ctrl.render()"></select>
             </div>
         </div>
+        <div class="gf-form">
+            <span class="gf-form-label width-9">Prefix</span>
+            <input type="text" class="gf-form-input max-width-9" ng-model="ctrl.panel.prefix" ng-change="ctrl.render()">
+        </div>
+        <div class="gf-form">
+            <span class="gf-form-label width-9">Suffix</span>
+            <input type="text" class="gf-form-input max-width-9" ng-model="ctrl.panel.suffix" ng-change="ctrl.render()">
+        </div>
+        <div class="gf-form">
+            <span class="gf-form-label width-9">Locale</span>
+            <input type="text" class="gf-form-input max-width-9" ng-model="ctrl.panel.locale" ng-change="ctrl.render()">
+        </div>
     </div>
 </div>

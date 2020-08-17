@@ -93,7 +93,10 @@ System.register(['app/plugins/sdk', 'lodash', 'app/core/utils/kbn', 'app/core/ti
                 width: 800,
                 height: 400,
                 colorSet: [],
-                colorSch: []
+                colorSch: [],
+                prefix: '',
+                suffix: '',
+                locale: 'pt-BR',
             };
 
             _export('GroupedBarChartCtrl', GroupedBarChartCtrl = function (_MetricsPanelCtrl) {
@@ -211,6 +214,9 @@ System.register(['app/plugins/sdk', 'lodash', 'app/core/utils/kbn', 'app/core/ti
                                 this.labelOrientation = opts.labelOrientation;
                                 this.avgLineShow = opts.avgLineShow;
                                 this.barValuesShow = opts.barValuesShow;
+                                this.prefix = opts.prefix;
+                                this.suffix = opts.suffix;
+                                this.locale = opts.locale;
                                 this.axesConfig = [];
                                 this.element = elem.find(opts.element)[0];
                                 this.options = d3.keys(this.data[0]).filter(function (key) {
@@ -256,7 +262,8 @@ System.register(['app/plugins/sdk', 'lodash', 'app/core/utils/kbn', 'app/core/ti
                                     this.addAxes();
                                     this.addTooltips();
                                     this.addBar();
-                                    d3.select(this.element).attr('style', 'width: ' + this.width * 1.5 + 'px; height: ' + this.height * 1.5 + 'px');
+                                    // d3.select(this.element).attr('style', 'width: ' + this.width * 1.5 + 'px; height: ' + this.height * 1.5 + 'px');
+                                    d3.select(this.element).attr('style', 'width: ' + this.width * 1.0 + 'px; height: ' + this.height * 1.5 + 'px');
                                     if (this.showLegend) this.addLegend(this.legendType);
                                 }
                             }, {
@@ -272,7 +279,8 @@ System.register(['app/plugins/sdk', 'lodash', 'app/core/utils/kbn', 'app/core/ti
                                             this.axesConfig = [this.x, this.y0, this.y0, this.y1, this.x];
                                             break;
                                         case 'vertical':
-                                            this.x0 = d3.scale.ordinal().rangeRoundBands([0, +this.width], .2, 0.5);
+                                            // this.x0 = d3.scale.ordinal().rangeRoundBands([0, +this.width], .2, 0.5);
+                                            this.x0 = d3.scale.ordinal().rangeRoundBands([0, +this.width], .1, 0.2);
 
                                             this.x1 = d3.scale.ordinal();
 
@@ -396,8 +404,8 @@ System.register(['app/plugins/sdk', 'lodash', 'app/core/utils/kbn', 'app/core/ti
                                         }).attr('y', function (d) {
                                             return _this4.orientation === 'horizontal' ? _this4.y1(d.name) + _this4.y1.rangeBand() / 2 : _this4.y(d.value) - _this4.height - 8;
                                         }).attr('dy', '.35em').style('fill', '' + this.fontColor).text(function (d) {
-                                            return d.value ? d.value : '';
-                                        });
+                                            return d.value ? ( _this4.prefix + ' ' + d.value.toLocaleString(_this4.locale) + ' ' + _this4.suffix ) : '';
+                                        }).attr('style', 'z-index', '999999999');
                                     }
 
                                     this.bar.on('mouseover', function (d) {
@@ -406,7 +414,8 @@ System.register(['app/plugins/sdk', 'lodash', 'app/core/utils/kbn', 'app/core/ti
                                         _this4.tips.style('display', "inline-block");
                                         var elements = d3.selectAll(':hover')[0];
                                         var elementData = elements[elements.length - 1].__data__;
-                                        _this4.tips.html(d.label + ' , ' + elementData.name + ' ,  ' + elementData.value);
+                                        // _this4.tips.html(d.label + ' , ' + elementData.name + ' ,  ' + elementData.value);
+                                        _this4.tips.html(d.label + ' , ' + elementData.name + ' ,  ' + ( _this4.prefix + ' ' + elementData.value.toLocaleString(_this4.locale) + ' ' + _this4.suffix ) );
                                         if (_this4.avgLineShow) d3.selectAll('.' + elementData.name)[0][0].style.display = '';
                                     });
 
@@ -467,11 +476,13 @@ System.register(['app/plugins/sdk', 'lodash', 'app/core/utils/kbn', 'app/core/ti
 
                         function onRender() {
                             if (!ctrl.data) return;
+                            console.log(window.innerWidth + " INNER");
                             var Chart = new groupedBarChart({
                                 data: ctrl.data,
                                 margin: { top: 30, left: 80, bottom: 10, right: 10 },
                                 element: '#chart',
-                                width: ctrl.panel.width,
+                                // width: ctrl.panel.width,
+                                width: (window.innerWidth * 0.85),
                                 height: ctrl.panel.height,
                                 legend: ctrl.panel.legend.show,
                                 fontColor: ctrl.panel.fontColor,
@@ -482,13 +493,17 @@ System.register(['app/plugins/sdk', 'lodash', 'app/core/utils/kbn', 'app/core/ti
                                 labelSpace: ctrl.panel.labelSpace,
                                 avgLineShow: ctrl.panel.avgLineShow,
                                 barValuesShow: ctrl.panel.barValuesShow,
-                                color: ctrl.panel.colorSch
+                                color: ctrl.panel.colorSch,
+                                prefix: ctrl.panel.prefix,
+                                suffix: ctrl.panel.suffix,
+                                locale: ctrl.panel.locale,
                             });
 
                             ctrl.panel.colorSet = [];
                             Chart.options.forEach(function (d) {
                                 ctrl.panel.colorSet.push({ text: d, color: Chart.color(d) });
                             });
+
                         }
 
                         this.events.on('render', function () {
